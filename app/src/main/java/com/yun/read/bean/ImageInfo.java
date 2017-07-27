@@ -26,7 +26,25 @@ public class ImageInfo {
 
     private String who;
 
+    private int thumbWidth;
 
+    private int thumbHeight;
+
+    public int getThumbWidth() {
+        return thumbWidth;
+    }
+
+    public void setThumbWidth(int thumbWidth) {
+        this.thumbWidth = thumbWidth;
+    }
+
+    public int getThumbHeight() {
+        return thumbHeight;
+    }
+
+    public void setThumbHeight(int thumbHeight) {
+        this.thumbHeight = thumbHeight;
+    }
 
     public String get_id() {
         return _id;
