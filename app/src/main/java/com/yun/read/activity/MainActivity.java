@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.google.gson.Gson;
@@ -33,7 +34,7 @@ import butterknife.ButterKnife;
  * @email 773675907@qq.com
  * @createdate 2017/07/26
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.tl_custom)
     Toolbar mToolbar;
 
@@ -78,13 +79,10 @@ public class MainActivity extends BaseActivity {
         });
 
         group_fragment_list.setLayoutManager(layoutManager);
-        SpacesItemDecoration decoration=new SpacesItemDecoration(16);
+        SpacesItemDecoration decoration = new SpacesItemDecoration(16);
         group_fragment_list.addItemDecoration(decoration);
 
-
-
-
-        adapter=new MainAdapter(this);
+        adapter = new MainAdapter(this);
         adapter.addOnItemClickListener(new MainAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -105,18 +103,15 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onSucess(String json) {
-                Gson gson=new Gson();
+                Gson gson = new Gson();
 
-                final ImageBeans beans=gson.fromJson(json,ImageBeans.class);
+                final ImageBeans beans = gson.fromJson(json, ImageBeans.class);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(!beans.isError())
-                        {
+                        if (!beans.isError()) {
                             adapter.setData(beans.getResults());
-                        }
-                        else
-                        {
+                        } else {
                             tost("获取失败!");
                         }
 
@@ -129,7 +124,7 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * 上拉加载的相关操作
+     * 下拉刷新的相关操作
      */
     private void initPull() {
 
@@ -138,14 +133,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+                Log.e("insert", newState + "===newState=" );
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                Log.e("insert", dx + "====" + dy);
                 int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
                 pull_swiperefresh.setEnabled(topRowVerticalPosition >= 0);
             }
         });
+        pull_swiperefresh.setOnRefreshListener(this);
     }
 
     /**
@@ -171,5 +169,15 @@ public class MainActivity extends BaseActivity {
         };
         mDrawerToggle.syncState();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    @Override
+    public void onRefresh() {
+        pull_swiperefresh.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                pull_swiperefresh.setRefreshing(false);
+            }
+        },300);
     }
 }

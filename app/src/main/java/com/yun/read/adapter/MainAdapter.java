@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -18,7 +19,9 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.yun.read.R;
 import com.yun.read.activity.PictureActivity;
 import com.yun.read.bean.ImageInfo;
+
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -27,7 +30,7 @@ import butterknife.OnClick;
  * Created by Administrator on 2017/7/26 0026.
  */
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyHolder> {
+public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Context context;
 
@@ -62,20 +65,20 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final MyHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         ImageInfo imageInfo = mlist.get(position);
-        holder.imageInfo = imageInfo;
+        ((MyHolder) holder).imageInfo = imageInfo;
         int thumbWidth = mlist.get(position).getThumbWidth();
         int thumbHeight = mlist.get(position).getThumbHeight();
         if (thumbWidth > 0 && thumbHeight > 0) {
-            int width = holder.img.getMeasuredWidth();
+            int width = ((MyHolder) holder).img.getMeasuredWidth();
             int height = width * (thumbHeight / thumbWidth);
-            holder.img.getLayoutParams().height = height;
-            ViewGroup.LayoutParams layoutParams = holder.img.getLayoutParams();
+            ((MyHolder) holder).img.getLayoutParams().height = height;
+            ViewGroup.LayoutParams layoutParams = ((MyHolder) holder).img.getLayoutParams();
             layoutParams.height = height;
-            holder.img.setLayoutParams(layoutParams);
+            ((MyHolder) holder).img.setLayoutParams(layoutParams);
             Glide.with(context).load(mlist.get(position).getUrl()).placeholder(R.mipmap.loading)
-                    .error(R.mipmap.loadfail).animate(R.anim.zoom_in).into(holder.img);
+                    .error(R.mipmap.loadfail).animate(R.anim.zoom_in).into(((MyHolder) holder).img);
         } else
             Glide.with(context).load(mlist.get(position).getUrl()).placeholder(R.mipmap.loading)
                     .error(R.mipmap.loadfail).animate(R.anim.zoom_in).into(new SimpleTarget<GlideDrawable>() {
@@ -83,17 +86,17 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyHolder> {
                 public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                     mlist.get(position).setThumbWidth(resource.getIntrinsicWidth());
                     mlist.get(position).setThumbHeight(resource.getIntrinsicHeight());
-                    int width = holder.img.getMeasuredWidth();
+                    int width = ((MyHolder) holder).img.getMeasuredWidth();
                     int height = width * (resource.getIntrinsicHeight() / resource.getIntrinsicWidth());
-                    holder.img.getLayoutParams().height = height;
-                    ViewGroup.LayoutParams layoutParams = holder.img.getLayoutParams();
+                    ((MyHolder) holder).img.getLayoutParams().height = height;
+                    ViewGroup.LayoutParams layoutParams = ((MyHolder) holder).img.getLayoutParams();
                     layoutParams.height = height;
-                    holder.img.setLayoutParams(layoutParams);
+                    ((MyHolder) holder).img.setLayoutParams(layoutParams);
                     Glide.with(context).load(mlist.get(position).getUrl()).placeholder(R.mipmap.loading)
-                            .error(R.mipmap.loadfail).animate(R.anim.zoom_in).into(holder.img);
+                            .error(R.mipmap.loadfail).animate(R.anim.zoom_in).into(((MyHolder) holder).img);
                 }
             });
-        holder.text.setText(mlist.get(position).getDesc());
+        ((MyHolder) holder).text.setText(mlist.get(position).getDesc());
     }
 
 
