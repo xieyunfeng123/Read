@@ -1,8 +1,10 @@
 package com.yun.read.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 
 import com.scwang.smartrefresh.header.MaterialHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -20,16 +22,34 @@ import butterknife.ButterKnife;
 
 public class WeleComeActivity extends BaseActivity {
 
-    @BindView(R.id.refreshlayout)
-    RefreshLayout refreshlayout;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welecome);
         ButterKnife.bind(this);
-        //设置 Header 为 Material风格
-        refreshlayout.setRefreshHeader(new MaterialHeader(this).setShowBezierWave(true));
-//设置 Footer 为 球脉冲
-        refreshlayout.setRefreshFooter(new BallPulseFooter(this).setSpinnerStyle(SpinnerStyle.Scale));
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent=new Intent(WeleComeActivity.this,MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+            }
+        }).start();
+
+
+
+
     }
 }

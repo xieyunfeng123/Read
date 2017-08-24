@@ -39,7 +39,6 @@ public class OkHttpUtil {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
               String result=  response.body().string();
-                Log.e("insert",result);
                 httpListener.onSucess(result);
             }
         });

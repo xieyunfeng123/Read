@@ -15,6 +15,10 @@ import android.view.View;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.yun.read.R;
 import com.yun.read.adapter.MainAdapter;
 import com.yun.read.base.BaseActivity;
@@ -41,8 +45,8 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
     @BindView(R.id.dl_left)
     DrawerLayout mDrawerLayout;
 
-    @BindView(R.id.pull_swiperefresh)
-    SwipeRefreshLayout pull_swiperefresh;
+    @BindView(R.id.refreshlayout)
+    SmartRefreshLayout pull_swiperefresh;
 
     @BindView(R.id.group_fragment_list)
     RecyclerView group_fragment_list;
@@ -90,36 +94,6 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
             }
         });
         group_fragment_list.setAdapter(adapter);
-        OkHttpUtil.getResult(1, new HttpListener() {
-            @Override
-            public void onFail() {
-                tost("请检查网络!");
-            }
-
-            @Override
-            public void onError() {
-
-            }
-
-            @Override
-            public void onSucess(String json) {
-                Gson gson = new Gson();
-
-                final ImageBeans beans = gson.fromJson(json, ImageBeans.class);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!beans.isError()) {
-                            adapter.setData(beans.getResults());
-                        } else {
-                            tost("获取失败!");
-                        }
-
-                    }
-                });
-
-            }
-        });
 
     }
 
@@ -127,23 +101,66 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
      * 下拉刷新的相关操作
      */
     private void initPull() {
-
-        pull_swiperefresh.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
-        group_fragment_list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        pull_swiperefresh.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                Log.e("insert", newState + "===newState=" );
-            }
+            public void onRefresh(RefreshLayout refreshlayout) {
+                OkHttpUtil.getResult(1, new HttpListener() {
+                    @Override
+                    public void onFail() {
+                        tost("请检查网络!");
+                        pull_swiperefresh.finishRefresh();
+                    }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                Log.e("insert", dx + "====" + dy);
-                int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
-                pull_swiperefresh.setEnabled(topRowVerticalPosition >= 0);
+                    @Override
+                    public void onError() {
+                        pull_swiperefresh.finishRefresh();
+                    }
+
+                    @Override
+                    public void onSucess(String json) {
+                        Gson gson = new Gson();
+                        Log.e("insert",json);
+                        final ImageBeans beans = gson.fromJson(json, ImageBeans.class);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!beans.isError()) {
+                                    Log.e("insert","==================================");
+                                    adapter.setData(beans.getResults());
+                                } else {
+                                    tost("获取失败!");
+                                }
+                                pull_swiperefresh.finishRefresh();
+                            }
+                        });
+
+                    }
+                });
             }
         });
-        pull_swiperefresh.setOnRefreshListener(this);
+        pull_swiperefresh.setOnLoadmoreListener(new OnLoadmoreListener() {
+            @Override
+            public void onLoadmore(RefreshLayout refreshlayout) {
+
+            }
+
+        });
+//        pull_swiperefresh.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
+//        group_fragment_list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                Log.e("insert", newState + "===newState=" );
+//            }
+//
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                Log.e("insert", dx + "====" + dy);
+//                int topRowVerticalPosition = (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+//                pull_swiperefresh.setEnabled(topRowVerticalPosition >= 0);
+//            }
+//        });
+//        pull_swiperefresh.setOnRefreshListener(this);
     }
 
     /**
@@ -173,11 +190,11 @@ public class MainActivity extends BaseActivity implements SwipeRefreshLayout.OnR
 
     @Override
     public void onRefresh() {
-        pull_swiperefresh.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                pull_swiperefresh.setRefreshing(false);
-            }
-        },300);
+//        pull_swiperefresh.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                pull_swiperefresh.setRefreshing(false);
+//            }
+//        },300);
     }
 }
